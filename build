@@ -1,0 +1,26 @@
+
+CXX=clang++-3.7
+CXX_FLAGS="-std=c++11 -Wall -pthread"
+
+# pi fixes...
+#CXX_FLAGS=${CXX_FLAGS}" -mcpu=cortex-a8 -march=armv7-a"
+#CXX_FLAGS=${CXX_FLAGS}" -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1"
+#CXX_FLAGS=${CXX_FLAGS}" -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
+#CXX_FLAGS=${CXX_FLAGS}" -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4"
+#CXX_FLAGS=${CXX_FLAGS}" -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"
+
+INCLUDES="-I."
+
+CXX_FLAGS="${CXX_FLAGS} ${INCLUDES}"
+
+echo "== Building =="
+CMD="${CXX} ${CXX_FLAGS} *.cpp"
+echo ${CMD}
+time ${CMD}
+STATUS=${?}
+
+echo "== Done =="
+echo
+
+exit ${STATUS}
+

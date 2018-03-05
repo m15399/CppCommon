@@ -12,8 +12,15 @@
 
 #include <unistd.h>
 
+using std::string;
+
+#define CONCAT1(a, b) a##b
+#define CONCAT(a, b) CONCAT1(a, b)
+
+#define UNIQNAME(a) CONCAT(a,__LINE__)
+
 #define LOCK(mtx) \
-	std::lock_guard<std::mutex> lock_##__LINE__(mtx)
+	std::lock_guard<std::mutex> CONCAT(_lock,__LINE__)(mtx)
 
 enum LogLevel {
 	DEBUG = 0,
@@ -41,6 +48,7 @@ constexpr Logger JobLogger(SILENT);
 	printf("FATAL ERROR: [%s:%d] " fmt "\n", __FILE__, __LINE__); \
 	exit(1);
 
+#include <Tests.h>
 #include <Threads.h>
 #include <Jobs.h>
 

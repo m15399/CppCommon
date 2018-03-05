@@ -18,6 +18,7 @@ class JobQueue {
 	std::list<Job> m_jobs;	
 public:
 	void Queue(Job job);
+	void Queue(JobFunc func);
 	void ExecuteLoop();
 	void Execute(int numThreads);
 };

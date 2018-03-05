@@ -16,6 +16,10 @@ void JobQueue::Queue(Job job){
 	m_jobs.push_back(job);
 }
 
+void JobQueue::Queue(JobFunc func){
+	Queue(Job(func));
+}
+
 void JobQueue::ExecuteLoop(){
 	while(true){
 		bool haveJob = false;
@@ -54,3 +58,49 @@ void JobQueue::Execute(int numThreads){
 	LogDebug(JobLogger, "JobQueue %p Done", this);
 }
 
+
+TEST(Job, Basic){
+	int x = 0;
+	Job j([&x](){x=4;});
+	j.Execute();
+	ASSERT_EQ(x, 4);
+}
+
+TEST(JobQueue, Basic){
+	int x = 0;
+
+	JobQueue q;
+	q.Queue([&x](){x = 4;});
+	q.Execute(1);
+
+	ASSERT_EQ(x, 4);
+}
+
+TEST(JobQueue, Parallel){
+	std::mutex mtx;
+	char output[1024];
+	int loc = 0;
+
+	constexpr const char* msg = "HelloWorld";	
+
+	JobFunc helloFunc = [&mtx, &output, &loc](){
+		for(int i = 0; i < strlen(msg);){
+			{
+				LOCK(mtx);
+				for(int j = 0; j < 4; j++)
+					output[loc++] = (char) msg[i++];
+			}
+			usleep(10000);
+		}
+	};
+
+	JobQueue q;
+	for(int i = 0; i < 10; i++)
+		q.Queue(Job(helloFunc));
+
+	q.Execute(80);
+
+	string s(output);
+	s = s.substr(0, strlen(msg));
+	ASSERT_FALSE(s == string(msg));
+}

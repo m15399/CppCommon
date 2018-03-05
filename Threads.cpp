@@ -24,3 +24,13 @@ void Thread::Join(){
 	}
 }
 
+
+
+TEST(Thread, Basic){
+	int x = 0;
+	Thread t([&x](){usleep(100000); x = 4;});
+	ASSERT_EQ(x, 0);
+	t.Join();
+	ASSERT_EQ(x, 4);
+}
+

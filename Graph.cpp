@@ -12,7 +12,6 @@ public:
 		list<Node*> m_children;
 
 		Node(const T& value);
-		bool operator==(const Node& other);
 		
 		void AddChild(Node* child);
 		void RemoveChild(Node* child);
@@ -34,11 +33,6 @@ template<typename T>
 Graph<T>::Node::Node(const T& data):
 	m_data(data){
 
-}
-
-template<typename T>
-bool Graph<T>::Node::operator==(const Node& other){
-	return this == &other;
 }
 
 template<typename T>
@@ -86,11 +80,11 @@ void* Graph<T>::CreateNode(const T& data){
 }
 
 template<typename T>
-void Graph<T>::DeleteNode(Node* node){
+void Graph<T>::DeleteNode(Graph<T>::Node* node){
 	node->RemoveAllChildren();
 	node->RemoveAllParents();
 
-	m_nodes.remove(*node);
+	m_nodes.remove_if([node](const Graph<T>::Node& value){ return &value == node; });
 }
 
 

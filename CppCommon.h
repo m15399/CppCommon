@@ -36,11 +36,11 @@ enum LogLevel {
 
 using Logger = LogLevel;
 
-constexpr Logger JobLogger(DEBUG);
+constexpr Logger JobLogger(SILENT);
 
 #define LogMessage(level, logger, fmt, ...) \
 	if(logger <= level) { \
-		printf("[" #logger "] %s:%d<%lx> " fmt "\n", __FILE__, __LINE__, pthread_self(), __VA_ARGS__); \
+		printf("[" #logger "] %s:%d<%lx> " fmt "\n", __FILE__, __LINE__, (unsigned long)pthread_self(), __VA_ARGS__); \
 	}
 
 #define LogDebug(logger, fmt, ...) \

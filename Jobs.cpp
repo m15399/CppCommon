@@ -45,7 +45,7 @@ void JobQueue::ExecuteLoop(){
 }
 
 void JobQueue::Execute(int numThreads){
-	std::vector<Thread> threads;
+	std::list<Thread> threads;
 
 	LogDebug(JobLogger, "%p Enqueueing jobs...", this);
 
@@ -89,7 +89,6 @@ TEST(JobQueue, Parallel){
 	constexpr const char* msg = "HelloWorld";	
 
 	JobFunc helloFunc = [&mtx, &output, &loc](){
-		LogDebugSz(JobLogger, "doin stuff");
 		for(size_t i = 0; i < strlen(msg);){
 			{
 				LOCK(mtx);

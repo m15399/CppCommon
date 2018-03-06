@@ -26,15 +26,19 @@ void JobQueue::ExecuteLoop(){
 		Job nextJob;
 		{
 			LOCK(m_mtx);
+			LogDebug(JobLogger, "%p Looking for job", this);
 			if(m_jobs.size() > 0){
 				haveJob = true;
 				nextJob = m_jobs.front();
 				m_jobs.pop_front();
+				LogDebug(JobLogger, "%p Found a job", this);
 			}
 		}
 		if (haveJob){
+			LogDebug(JobLogger, "%p Executing a job", this);
 			nextJob.Execute();
 		} else {
+			LogDebug(JobLogger, "%p No more jobs", this);
 			break;
 		}
 	}
@@ -43,19 +47,20 @@ void JobQueue::ExecuteLoop(){
 void JobQueue::Execute(int numThreads){
 	std::vector<Thread> threads;
 
-	LogDebug(JobLogger, "JobQueue %p Enqueueing jobs...", this);
+	LogDebug(JobLogger, "%p Enqueueing jobs...", this);
 
 	for(int i = 0; i < numThreads; i++){
+		LogDebug(JobLogger, "%p Enqueueing job %d", this, i);
 		threads.emplace_back([this](){ExecuteLoop();});
 	}
 
-	LogDebug(JobLogger, "JobQueue %p Waiting on jobs...", this);
+	LogDebug(JobLogger, "%p Waiting on jobs...", this);
 
 	for(Thread thread : threads){
 		thread.Join();
 	}
 
-	LogDebug(JobLogger, "JobQueue %p Done", this);
+	LogDebug(JobLogger, "%p Done", this);
 }
 
 
@@ -78,13 +83,14 @@ TEST(JobQueue, Basic){
 
 TEST(JobQueue, Parallel){
 	std::mutex mtx;
-	char output[1024];
-	int loc = 0;
+	volatile char output[4096];
+	volatile int loc = 0;
 
 	constexpr const char* msg = "HelloWorld";	
 
 	JobFunc helloFunc = [&mtx, &output, &loc](){
-		for(int i = 0; i < strlen(msg);){
+		LogDebugSz(JobLogger, "doin stuff");
+		for(size_t i = 0; i < strlen(msg);){
 			{
 				LOCK(mtx);
 				for(int j = 0; j < 4; j++)
@@ -95,12 +101,14 @@ TEST(JobQueue, Parallel){
 	};
 
 	JobQueue q;
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 2; i++)
 		q.Queue(Job(helloFunc));
 
-	q.Execute(80);
+	q.Execute(4);
 
-	string s(output);
+	char* o = (char*) output;
+	string s(o);
 	s = s.substr(0, strlen(msg));
 	ASSERT_FALSE(s == string(msg));
 }
+

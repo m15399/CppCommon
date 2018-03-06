@@ -1,6 +1,6 @@
 
-CXX=clang++-3.7
-CXX_FLAGS="-std=c++11 -Wall -pthread"
+CXX=g++
+CXX_FLAGS="-g -std=c++11 -Wall -pthread"
 
 # pi fixes...
 #CXX_FLAGS=${CXX_FLAGS}" -mcpu=cortex-a8 -march=armv7-a"

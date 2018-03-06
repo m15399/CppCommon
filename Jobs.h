@@ -6,8 +6,9 @@
 using JobFunc = std::function<void(void)>;
 
 class Job {
-	JobFunc m_func;
 public:
+	JobFunc m_func;
+
 	Job();
 	Job(JobFunc func);
 	void Execute();

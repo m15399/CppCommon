@@ -13,6 +13,10 @@
 #include <unistd.h>
 
 using std::string;
+using std::vector;
+using std::list;
+using std::mutex;
+using std::cout;
 
 #define CONCAT1(a, b) a##b
 #define CONCAT(a, b) CONCAT1(a, b)
@@ -22,6 +26,8 @@ using std::string;
 #define LOCK(mtx) \
 	std::lock_guard<std::mutex> CONCAT(_lock,__LINE__)(mtx)
 
+
+
 enum LogLevel {
 	DEBUG = 0,
 	ERROR,
@@ -30,15 +36,18 @@ enum LogLevel {
 
 using Logger = LogLevel;
 
-constexpr Logger JobLogger(SILENT);
+constexpr Logger JobLogger(DEBUG);
 
 #define LogMessage(level, logger, fmt, ...) \
 	if(logger <= level) { \
-		printf("[%s:%d] " fmt "\n", __FILE__, __LINE__, __VA_ARGS__); \
+		printf("[" #logger "] %s:%d<%lx> " fmt "\n", __FILE__, __LINE__, pthread_self(), __VA_ARGS__); \
 	}
 
 #define LogDebug(logger, fmt, ...) \
 	LogMessage(DEBUG, logger, fmt, __VA_ARGS__);
+#define LogDebugSz(logger, fmt) \
+	LogDebug(logger, fmt "%s", "");
+
 
 #define Fatal(fmt, ...) \
 	printf("FATAL ERROR: [%s:%d] " fmt "\n", __FILE__, __LINE__, __VA_ARGS__); \
@@ -47,6 +56,8 @@ constexpr Logger JobLogger(SILENT);
 #define FatalSz(fmt) \
 	printf("FATAL ERROR: [%s:%d] " fmt "\n", __FILE__, __LINE__); \
 	exit(1);
+
+
 
 #include <Tests.h>
 #include <Threads.h>

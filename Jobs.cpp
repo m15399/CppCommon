@@ -31,7 +31,6 @@ void JobQueue::ExecuteLoop(){
 				haveJob = true;
 				nextJob = m_jobs.front();
 				m_jobs.pop_front();
-				LogDebug(JobLogger, "%p Found a job", this);
 			}
 		}
 		if (haveJob){
@@ -50,7 +49,6 @@ void JobQueue::Execute(int numThreads){
 	LogDebug(JobLogger, "%p Enqueueing jobs...", this);
 
 	for(int i = 0; i < numThreads; i++){
-		LogDebug(JobLogger, "%p Enqueueing job %d", this, i);
 		threads.emplace_back([this](){ExecuteLoop();});
 	}
 
@@ -83,8 +81,8 @@ TEST(JobQueue, Basic){
 
 TEST(JobQueue, Parallel){
 	std::mutex mtx;
-	volatile char output[4096];
-	volatile int loc = 0;
+	char output[4096];
+	int loc = 0;
 
 	constexpr const char* msg = "HelloWorld";	
 
@@ -93,20 +91,19 @@ TEST(JobQueue, Parallel){
 			{
 				LOCK(mtx);
 				for(int j = 0; j < 4; j++)
-					output[loc++] = (char) msg[i++];
+					output[loc++] = msg[i++];
 			}
 			usleep(10000);
 		}
 	};
 
 	JobQueue q;
-	for(int i = 0; i < 2; i++)
+	for(int i = 0; i < 10; i++)
 		q.Queue(Job(helloFunc));
 
-	q.Execute(4);
+	q.Execute(40);
 
-	char* o = (char*) output;
-	string s(o);
+	string s(output);
 	s = s.substr(0, strlen(msg));
 	ASSERT_FALSE(s == string(msg));
 }

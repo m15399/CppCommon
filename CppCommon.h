@@ -9,6 +9,7 @@
 #include <mutex>
 #include <string>
 #include <string.h>
+#include <assert.h>
 
 #include <unistd.h>
 
@@ -62,4 +63,5 @@ constexpr Logger JobLogger(SILENT);
 #include <Tests.h>
 #include <Threads.h>
 #include <Jobs.h>
+#include <Graph.h>
 

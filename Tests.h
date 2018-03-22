@@ -29,6 +29,7 @@ public:
 
 #define PRINT_FAIL_LOC() \
 	printf("  FAILURE at %s::%d\n", __FILE__, __LINE__);
+// TODO we should throw instead of return
 #define TEST_FAIL(msg) \
 	*_testStatus = FAILED; return;
 #define ASSERT_TRUE(e) \

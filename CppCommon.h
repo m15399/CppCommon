@@ -10,6 +10,7 @@
 #include <string>
 #include <string.h>
 #include <assert.h>
+#include <atomic>
 
 #include <unistd.h>
 
@@ -18,6 +19,7 @@ using std::vector;
 using std::list;
 using std::mutex;
 using std::cout;
+using std::atomic;
 
 #define CONCAT1(a, b) a##b
 #define CONCAT(a, b) CONCAT1(a, b)
